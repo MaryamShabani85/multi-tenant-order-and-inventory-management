@@ -1,9 +1,7 @@
-import { boolean, mysqlTable, char, decimal, timestamp, uniqueIndex, mysqlEnum } from 'drizzle-orm/mysql-core';
+import { mysqlTable, char, decimal, timestamp, uniqueIndex, mysqlEnum } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
 import { TenantsSchema } from '../identity/TenantsSchema';
-import { ProductCategoriesSchema } from './ProductCategoriesSchema';
 import { getEnumValues } from '../../../common/utils/EnumUtils';
-import { ProductUnitEnum } from '../../../enum/ProductUnitEnum';
 import { StockTransactionTypeEnum } from '../../../enum/StockTransactionTypeEnum';
 import { WarehousesSchema } from './WarehousesSchema';
 import { ProductsSchema } from './ProductsSchema';
