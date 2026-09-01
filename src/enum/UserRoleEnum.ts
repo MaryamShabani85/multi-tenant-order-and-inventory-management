@@ -1,0 +1,7 @@
+export enum UserRoleEnum
+{
+    TENANT_ADMIN = 'TENANT_ADMIN',
+    SALES_MANAGER = 'SALES_MANAGER',
+    WAREHOUSE_STAFF = 'WAREHOUSE_STAFF',
+    READ_ONLY = 'READ_ONLY',
+}
