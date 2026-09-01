@@ -5,7 +5,7 @@ import { getEnumValues } from '../../../common/utils/EnumUtils';
 import { UserRoleEnum } from '../../../enum/UserRoleEnum';
 
 // 1. جدول کاربران درون سازمانی هر مستأجر (Users)
-export const userRoleEnum = mysqlEnum('user_role', getEnumValues(UserRoleEnum));
+export const userRole = mysqlEnum('user_role', getEnumValues(UserRoleEnum));
 
 export const UsersSchema = mysqlTable(
     'users',
@@ -17,7 +17,7 @@ export const UsersSchema = mysqlTable(
         email: varchar('email', { length: 255 }).notNull(),
         passwordHash: varchar('password_hash', { length: 255 }).notNull(),
         fullName: varchar('full_name', { length: 150 }).notNull(),
-        role: userRoleEnum.notNull().default(UserRoleEnum.READ_ONLY),
+        role: userRole.notNull().default(UserRoleEnum.READ_ONLY),
         isActive: boolean('is_active').notNull().default(true),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
