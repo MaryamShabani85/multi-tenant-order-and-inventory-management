@@ -4,9 +4,9 @@ import { TenantsSchema } from '../identity/TenantsSchema';
 
 // 1. جدول انبار (Warehouses)
 export const WarehousesSchema = mysqlTable(
-    'products',
+    'warehouses',
     {
-        id: char('id', { length: 26 }).primaryKey(), // UUID v4 / ULID
+        id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
             .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
@@ -17,7 +17,7 @@ export const WarehousesSchema = mysqlTable(
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
     },
     (table) => [
-        uniqueIndex('warehouses_code_uq').on(table.code),
+        uniqueIndex('warehouses_tenant_code_uq').on(table.tenantId, table.code),
     ]
 );
 

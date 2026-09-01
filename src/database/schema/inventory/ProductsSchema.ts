@@ -10,7 +10,7 @@ const productUnit = mysqlEnum('product_unit', getEnumValues(ProductUnitEnum));
 export const ProductsSchema = mysqlTable(
     'products',
     {
-        id: char('id', { length: 26 }).primaryKey(), // UUID v4 / ULID
+        id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
             .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
@@ -18,15 +18,15 @@ export const ProductsSchema = mysqlTable(
             .notNull()
             .references(() => ProductCategoriesSchema.id, { onDelete: 'cascade' }),
         name: varchar('name', { length: 255 }).notNull(),
-        sku: varchar('sku', { length: 100 }).notNull(), // کد یکتای کالا در سطح مستأجر
-        barcode: varchar('barcode', { length: 14 }).notNull(),
+        sku: varchar('sku', { length: 100 }).notNull(),
+        barcode: varchar('barcode', { length: 50 }), // در صورت نیاز nullable
         isActive: boolean('is_active').notNull().default(true),
         unit: productUnit.notNull().default(ProductUnitEnum.PCS),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
     },
     (table) => [
-        uniqueIndex('products_sku_uq').on(table.sku),
+        uniqueIndex('products_tenant_sku_uq').on(table.tenantId, table.sku),
     ]
 );
 
