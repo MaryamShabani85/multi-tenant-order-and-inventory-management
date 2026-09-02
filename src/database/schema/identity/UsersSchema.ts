@@ -4,6 +4,7 @@ import { TenantsSchema } from "./TenantsSchema"
 import { getEnumValues } from '../../../common/utils/EnumUtils';
 import { UserRoleEnum } from '../../../enum/UserRoleEnum';
 import { stockTransactionRelations, StockTransactionsSchema } from '../inventory/StockTransactionsSchema';
+import { OrdersSchema } from '../business/OrdersSchema';
 
 // 1. جدول کاربران درون سازمانی هر مستأجر (Users)
 export const userRole = mysqlEnum('user_role', getEnumValues(UserRoleEnum));
@@ -14,7 +15,7 @@ export const UsersSchema = mysqlTable(
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
         email: varchar('email', { length: 255 }).notNull(),
         passwordHash: varchar('password_hash', { length: 255 }).notNull(),
         fullName: varchar('full_name', { length: 150 }).notNull(),
@@ -22,6 +23,7 @@ export const UsersSchema = mysqlTable(
         isActive: boolean('is_active').notNull().default(true),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         // ایمیل در سطح کل سیستم یا در سطح هر مستأجر یکتا باشد (در مدل SaaS ایزوله معمولاً ترکیب tenantId + email یکتاست)
@@ -37,4 +39,5 @@ export const usersRelations = relations(UsersSchema, ({ one, many }) => ({
         references: [TenantsSchema.id],
     }),
     stockTransactions: many(StockTransactionsSchema),
+    orders: many(OrdersSchema)
 }));

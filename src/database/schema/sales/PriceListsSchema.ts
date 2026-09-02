@@ -19,11 +19,12 @@ export const PriceListsSchema = mysqlTable(
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
         name: varchar('name', { length: 255 }).notNull(),
         isActive: boolean('is_active').notNull().default(true),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         uniqueIndex('price_lists_tenant_name_uq').on(

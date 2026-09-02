@@ -7,6 +7,7 @@ import { ProductUnitEnum } from '../../../enum/ProductUnitEnum';
 import { InventorySchema } from './InventorySchema';
 import { StockTransactionsSchema } from './StockTransactionsSchema';
 import { CustomerCustomPricesSchema } from '../sales/CustomerCustomPricesSchema';
+import { orderItemRelations, OrderItemsSchema } from '../business/OrderItemsSchema';
 
 // 1. جدول کالا (Products)
 const productUnit = mysqlEnum('product_unit', getEnumValues(ProductUnitEnum));
@@ -16,10 +17,10 @@ export const ProductsSchema = mysqlTable(
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
         productCategoryId: char('product_category_id', { length: 26 })
             .notNull()
-            .references(() => ProductCategoriesSchema.id, { onDelete: 'cascade' }),
+            .references(() => ProductCategoriesSchema.id, { onDelete: 'restrict' }),
         name: varchar('name', { length: 255 }).notNull(),
         sku: varchar('sku', { length: 100 }).notNull(),
         barcode: varchar('barcode', { length: 50 }), // در صورت نیاز nullable
@@ -27,6 +28,7 @@ export const ProductsSchema = mysqlTable(
         unit: productUnit.notNull().default(ProductUnitEnum.PCS),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         uniqueIndex('products_tenant_sku_uq').on(table.tenantId, table.sku),
@@ -46,4 +48,5 @@ export const productRelations = relations(ProductsSchema, ({ one, many }) => ({
     inventory: many(InventorySchema),
     stockTransactions: many(StockTransactionsSchema),
     customerCustomPrices: many(CustomerCustomPricesSchema),
+    orderItems: many(OrderItemsSchema)
 }));

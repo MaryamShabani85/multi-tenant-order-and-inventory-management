@@ -3,6 +3,7 @@ import { relations, sql } from 'drizzle-orm';
 import { TenantsSchema } from '../identity/TenantsSchema';
 import { PriceListsSchema } from './PriceListsSchema';
 import { customerCustomPricesRelations, CustomerCustomPricesSchema } from './CustomerCustomPricesSchema';
+import { OrdersSchema } from '../business/OrdersSchema';
 
 // 1. جدول مشتریان (Customers)
 export const CustomersSchema = mysqlTable(
@@ -11,7 +12,7 @@ export const CustomersSchema = mysqlTable(
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
         companyName: varchar('company_name', { length: 255 }).notNull(),
         nationalId: varchar('national_id', { length: 11 }).notNull(),
         economicCode: varchar('economic_code', { length: 12 }),
@@ -20,7 +21,7 @@ export const CustomersSchema = mysqlTable(
         email: varchar('email', { length: 50 }),
         website: varchar('website', { length: 100 }),
         postalCode: char('postal_code', { length: 10 }).notNull(),
-        address: varchar('address', { length: 200 }).notNull(),
+        address: varchar('address', { length: 500 }).notNull(),
         defaultPriceListId: char('default_price_list_id', { length: 26 })
             .references(() => PriceListsSchema.id, { onDelete: 'set null' }),
         creditLimit: bigint('credit_limit', { mode: 'number' }).notNull().default(0),
@@ -29,6 +30,7 @@ export const CustomersSchema = mysqlTable(
         isActive: boolean('is_active').notNull().default(true),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         check('chk_phone_digits_start_zero', sql`${table.phone} REGEXP '^0[0-9]{10}$'`),
@@ -50,4 +52,5 @@ export const customerRelations = relations(CustomersSchema, ({ one, many }) => (
         references: [PriceListsSchema.id],
     }),
     customerCustomPrices: many(CustomerCustomPricesSchema),
+    orders: many(OrdersSchema)
 }));

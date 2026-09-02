@@ -11,6 +11,9 @@ import { stockTransactionRelations, StockTransactionsSchema } from '../inventory
 import { CustomersSchema } from '../sales/CustomersSchema';
 import { PriceListsSchema } from '../sales/PriceListsSchema';
 import { PriceListItemsSchema } from '../sales/PriceListItemsSchema';
+import { customerCustomPricesRelations, CustomerCustomPricesSchema } from '../sales/CustomerCustomPricesSchema';
+import { OrdersSchema } from '../business/OrdersSchema';
+import { orderItemRelations, OrderItemsSchema } from '../business/OrderItemsSchema';
 
 // 1. جدول مستأجرین (Tenants / Companies)
 const tenantStatus = mysqlEnum('tenant_status', getEnumValues(TenantStatusEnum));
@@ -23,6 +26,7 @@ export const TenantsSchema = mysqlTable(
         status: tenantStatus.notNull().default(TenantStatusEnum.ACTIVE),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         uniqueIndex('tenants_slug_uq').on(table.slug),
@@ -39,5 +43,8 @@ export const tenantsRelations = relations(TenantsSchema, ({ many }) => ({
     stockTransactions: many(StockTransactionsSchema),
     customers: many(CustomersSchema),
     priceLists: many(PriceListsSchema),
-    priceListItems: many(PriceListItemsSchema)
+    priceListItems: many(PriceListItemsSchema),
+    customerCustomPrices: many(CustomerCustomPricesSchema),
+    orders: many(OrdersSchema),
+    orderItems: many(OrderItemsSchema),
 }));

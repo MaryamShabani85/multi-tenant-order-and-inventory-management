@@ -11,18 +11,19 @@ export const InventorySchema = mysqlTable(
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
         warehouseId: char('warehouse_id', { length: 26 })
             .notNull()
-            .references(() => WarehousesSchema.id, { onDelete: 'cascade' }),
+            .references(() => WarehousesSchema.id, { onDelete: 'restrict' }),
         productId: char('product_id', { length: 26 })
             .notNull()
-            .references(() => ProductsSchema.id, { onDelete: 'cascade' }),
+            .references(() => ProductsSchema.id, { onDelete: 'restrict' }),
         onHandQuantity: decimal('on_hand_quantity', { precision: 12, scale: 4 }).notNull().default('0'),
         reservedQuantity: decimal('reserved_quantity', { precision: 12, scale: 4 }).notNull().default('0'),
         reorderPoint: decimal('reorder_point', { precision: 12, scale: 4 }).notNull().default('0'),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         uniqueIndex('inventory_tenant_warehouse_product_uq').on(table.tenantId, table.warehouseId, table.productId),

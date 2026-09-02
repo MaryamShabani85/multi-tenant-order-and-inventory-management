@@ -7,29 +7,27 @@ import
     mysqlTable,
     timestamp,
     uniqueIndex,
-    varchar,
+    check,
 } from 'drizzle-orm/mysql-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { TenantsSchema } from '../identity/TenantsSchema';
-import { check } from 'drizzle-orm/mysql-core';
-import { sql } from 'drizzle-orm';
 import { CustomersSchema } from './CustomersSchema';
 import { ProductsSchema } from '../inventory/ProductsSchema';
 
-// جدول لیست‌های قیمت
+// جدول قیمت‌های اختصاصی مشتریان
 export const CustomerCustomPricesSchema = mysqlTable(
     'customer_custom_prices',
     {
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
-        customerId: char('tenant_id', { length: 26 })
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
+        customerId: char('customer_id', { length: 26 }) // اصلاح نام ستون
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
-        productId: char('tenant_id', { length: 26 })
+            .references(() => CustomersSchema.id, { onDelete: 'restrict' }), // اصلاح ارجاع
+        productId: char('product_id', { length: 26 }) // اصلاح نام ستون
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => ProductsSchema.id, { onDelete: 'restrict' }), // اصلاح ارجاع
         customPrice: bigint('custom_price', { mode: 'bigint' }).notNull(),
         minQuantity: decimal('min_quantity', {
             precision: 12,
@@ -37,9 +35,12 @@ export const CustomerCustomPricesSchema = mysqlTable(
         })
             .notNull()
             .default('1'),
-
+        isActive: boolean('is_active').notNull().default(true),
+        validFrom: timestamp('valid_from'),
+        validTo: timestamp('valid_to'),
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         uniqueIndex('customer_custom_prices_tenant_customer_product_uq').on(
@@ -58,6 +59,7 @@ export const CustomerCustomPricesSchema = mysqlTable(
     ],
 );
 
+// روابط Drizzle Relations
 export const customerCustomPricesRelations = relations(
     CustomerCustomPricesSchema,
     ({ one }) => ({
@@ -66,11 +68,11 @@ export const customerCustomPricesRelations = relations(
             references: [TenantsSchema.id],
         }),
         customer: one(CustomersSchema, {
-            fields: [CustomerCustomPricesSchema.tenantId],
+            fields: [CustomerCustomPricesSchema.customerId], // اصلاح فیلد رابط
             references: [CustomersSchema.id],
         }),
         product: one(ProductsSchema, {
-            fields: [CustomerCustomPricesSchema.tenantId],
+            fields: [CustomerCustomPricesSchema.productId], // اصلاح فیلد رابط
             references: [ProductsSchema.id],
         }),
     }),

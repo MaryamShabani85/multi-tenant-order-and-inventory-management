@@ -20,16 +20,16 @@ export const PriceListItemsSchema = mysqlTable(
         id: char('id', { length: 26 }).primaryKey(),
         tenantId: char('tenant_id', { length: 26 })
             .notNull()
-            .references(() => TenantsSchema.id, { onDelete: 'cascade' }),
+            .references(() => TenantsSchema.id, { onDelete: 'restrict' }),
         priceListId: char('price_list_id', { length: 26 })
             .notNull()
             .references(() => PriceListsSchema.id, {
-                onDelete: 'cascade',
+                onDelete: 'restrict',
             }),
         productId: char('product_id', { length: 26 })
             .notNull()
             .references(() => ProductsSchema.id, {
-                onDelete: 'cascade',
+                onDelete: 'restrict',
             }),
 
         // مبلغ صحیح بر حسب کوچک‌ترین واحد پولی، مثلاً ریال
@@ -45,6 +45,7 @@ export const PriceListItemsSchema = mysqlTable(
 
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+        deletedAt: timestamp('deleted_at'),
     },
     (table) => [
         uniqueIndex(
