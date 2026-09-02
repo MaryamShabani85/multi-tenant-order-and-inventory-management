@@ -1,6 +1,8 @@
 import { boolean, mysqlTable, char, varchar, timestamp, uniqueIndex } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
 import { TenantsSchema } from '../identity/TenantsSchema';
+import { InventorySchema } from './InventorySchema';
+import { StockTransactionsSchema } from './StockTransactionsSchema';
 
 // 1. جدول انبار (Warehouses)
 export const WarehousesSchema = mysqlTable(
@@ -22,9 +24,11 @@ export const WarehousesSchema = mysqlTable(
 );
 
 // روابط Drizzle Relations
-export const warehouseRelations = relations(WarehousesSchema, ({ one }) => ({
+export const warehouseRelations = relations(WarehousesSchema, ({ one, many }) => ({
     tenant: one(TenantsSchema, {
         fields: [WarehousesSchema.tenantId],
         references: [TenantsSchema.id],
     }),
+    inventory: many(InventorySchema),
+    stockTransactions: many(StockTransactionsSchema),
 }));

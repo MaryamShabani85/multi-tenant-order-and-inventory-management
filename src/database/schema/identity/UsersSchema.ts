@@ -3,6 +3,7 @@ import { relations } from 'drizzle-orm';
 import { TenantsSchema } from "./TenantsSchema"
 import { getEnumValues } from '../../../common/utils/EnumUtils';
 import { UserRoleEnum } from '../../../enum/UserRoleEnum';
+import { stockTransactionRelations, StockTransactionsSchema } from '../inventory/StockTransactionsSchema';
 
 // 1. جدول کاربران درون سازمانی هر مستأجر (Users)
 export const userRole = mysqlEnum('user_role', getEnumValues(UserRoleEnum));
@@ -30,9 +31,10 @@ export const UsersSchema = mysqlTable(
 );
 
 // روابط Drizzle Relations
-export const usersRelations = relations(UsersSchema, ({ one }) => ({
+export const usersRelations = relations(UsersSchema, ({ one, many }) => ({
     tenant: one(TenantsSchema, {
         fields: [UsersSchema.tenantId],
         references: [TenantsSchema.id],
     }),
+    stockTransactions: many(StockTransactionsSchema),
 }));

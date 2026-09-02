@@ -4,6 +4,9 @@ import { TenantsSchema } from '../identity/TenantsSchema';
 import { ProductCategoriesSchema } from './ProductCategoriesSchema';
 import { getEnumValues } from '../../../common/utils/EnumUtils';
 import { ProductUnitEnum } from '../../../enum/ProductUnitEnum';
+import { InventorySchema } from './InventorySchema';
+import { StockTransactionsSchema } from './StockTransactionsSchema';
+import { CustomerCustomPricesSchema } from '../sales/CustomerCustomPricesSchema';
 
 // 1. جدول کالا (Products)
 const productUnit = mysqlEnum('product_unit', getEnumValues(ProductUnitEnum));
@@ -31,7 +34,7 @@ export const ProductsSchema = mysqlTable(
 );
 
 // روابط Drizzle Relations
-export const productRelations = relations(ProductsSchema, ({ one }) => ({
+export const productRelations = relations(ProductsSchema, ({ one, many }) => ({
     tenant: one(TenantsSchema, {
         fields: [ProductsSchema.tenantId],
         references: [TenantsSchema.id],
@@ -40,4 +43,7 @@ export const productRelations = relations(ProductsSchema, ({ one }) => ({
         fields: [ProductsSchema.productCategoryId],
         references: [ProductCategoriesSchema.id],
     }),
+    inventory: many(InventorySchema),
+    stockTransactions: many(StockTransactionsSchema),
+    customerCustomPrices: many(CustomerCustomPricesSchema),
 }));
