@@ -12,7 +12,7 @@ import { AuthController } from './AuthController';
         // تنظیمات ساخت توکن JWT
         JwtModule.register({
             global: true, // در دسترس بودن JwtService در کل برنامه
-            secret: process.env.JWT_SECRET || 'super_secret_jwt_key_change_in_prod',
+            secret: process.env.JWT_SECRET,
             signOptions: { expiresIn: '1d' }, // انقضای توکن: ۱ روز
         }),
     ],

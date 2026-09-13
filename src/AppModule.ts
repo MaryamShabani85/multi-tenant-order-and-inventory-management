@@ -5,6 +5,8 @@ import { TenantMiddleware } from './infrastructure/context/TenantMiddleware';
 import { DatabaseModule } from './database/DatabaseModule';
 import { TenantModule } from './core/tenant/TenantModule';
 import { AuthModule } from './modules/auth/AuthModule';
+import { APP_GUARD } from '@nestjs/core';
+import { JWTAuthGuard } from './common/guard/JWTAuthGuard';
 
 @Module({
   imports: [
@@ -13,7 +15,12 @@ import { AuthModule } from './modules/auth/AuthModule';
     AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JWTAuthGuard,
+    }
+  ],
 })
 export class AppModule implements NestModule
 {

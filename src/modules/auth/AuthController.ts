@@ -2,6 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './services/AuthService';
 import { RegisterDto } from './dto/RegisterTenantDto';
 import { LoginDto } from './dto/LoginDto';
+import { Public } from '../../common/decorator/Public';
 
 @Controller('auth') // مسیر پایه: /auth
 export class AuthController
@@ -9,12 +10,14 @@ export class AuthController
     // تزریق AuthService برای استفاده از منطق بیزینس
     constructor(private readonly authService: AuthService) { }
 
+    @Public()
     @Post('register') // مسیر کامل: POST /auth/register
     async register(@Body() registerDto: RegisterDto)
     {
         return await this.authService.register(registerDto);
     }
 
+    @Public()
     @Post('login') // مسیر کامل: POST /auth/login
     async login(@Body() loginDto: LoginDto)
     {
