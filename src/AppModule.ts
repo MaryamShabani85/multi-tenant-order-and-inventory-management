@@ -1,14 +1,16 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from './AppController';
+import { AppService } from './AppService';
 import { TenantMiddleware } from './infrastructure/context/TenantMiddleware';
 import { DatabaseModule } from './database/DatabaseModule';
 import { TenantModule } from './core/tenant/TenantModule';
+import { AuthModule } from './modules/auth/AuthModule';
 
 @Module({
   imports: [
     DatabaseModule,
-    TenantModule
+    TenantModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
