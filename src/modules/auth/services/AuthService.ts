@@ -10,12 +10,13 @@ import { RegisterDto } from '../dto/RegisterTenantDto';
 import { TenantStatusEnum } from '../../../enum/TenantStatusEnum';
 import { UserRoleEnum } from '../../../enum/UserRoleEnum';
 import { ulid } from 'ulid';
+import { DRIZZLE_PROVIDER } from '../../../database/DrizzleProvider';
 
 @Injectable()
 export class AuthService
 {
     constructor(
-        @Inject('DRIZZLE_PROVIDER') private readonly db: MySql2Database<typeof schema>,
+        @Inject(DRIZZLE_PROVIDER) private readonly db: MySql2Database<typeof schema>,
         private readonly jwtService: JwtService,
         private readonly passwordService: PasswordService,
     ) { }
