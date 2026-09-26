@@ -8,16 +8,18 @@ import { and, eq, isNull, like, ne } from "drizzle-orm";
 import { FilterWarehouseDto } from "../dto/FilterWarehouseDto";
 import { ParamIdDto } from "../../../common/dto/ParamIdDto";
 import { UpdateWarehouseDto } from "../dto/UpdateWarehouseDto";
+import { TenantContextService } from "../../../core/tenant/TenantContextService";
 
 @Injectable()
 export class WarehouseService {
     constructor(
         @Inject(DRIZZLE_PROVIDER) private readonly db: MySql2Database<typeof schema>,
+        private readonly tenantContext: TenantContextService,
     ) { }
 
-    async create(tenantId: string, warehouse: CreateWarehouseDto) {
+    async create(warehouse: CreateWarehouseDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
-
         // ۱. بررسی یکتا بودن کد در سطح تننت (حتی انبارهای حذف‌شده)
         const existingWarehouse = await this.db.query.WarehousesSchema.findFirst({
             where: and(
@@ -47,7 +49,8 @@ export class WarehouseService {
         };
     }
 
-    async findAll(tenantId: string, filter: FilterWarehouseDto) {
+    async findAll(filter: FilterWarehouseDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
         return await this.db.query.WarehousesSchema.findMany({
             where: and(
@@ -61,7 +64,8 @@ export class WarehouseService {
         });
     }
 
-    async findOne(tenantId: string, id: ParamIdDto) {
+    async findOne(id: ParamIdDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
         const warehouse = await this.db.query.WarehousesSchema.findFirst({
             where: and(
@@ -78,11 +82,12 @@ export class WarehouseService {
         return warehouse;
     }
 
-    async update(tenantId: string, id: ParamIdDto, warehouse: UpdateWarehouseDto) {
+    async update(id: ParamIdDto, warehouse: UpdateWarehouseDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
 
         // بررسی وجود انبار زنده
-        await this.findOne(tenantId, id);
+        await this.findOne(id);
 
         // اگر کد در حال ویرایش است، مطمئن شویم به نام انبار دیگری نیست
         if (warehouse.code) {
@@ -115,9 +120,10 @@ export class WarehouseService {
         };
     }
 
-    async delete(tenantId: string, id: ParamIdDto) {
+    async delete(id: ParamIdDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
-        await this.findOne(tenantId, id);
+        await this.findOne(id);
 
         await this.db.update(warehouses).set({
             deletedAt: new Date()
@@ -134,9 +140,10 @@ export class WarehouseService {
         };
     }
 
-    async active(tenantId: string, id: ParamIdDto) {
+    async active(id: ParamIdDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
-        await this.findOne(tenantId, id);
+        await this.findOne(id);
 
         await this.db.update(warehouses).set({
             isActive: true
@@ -153,9 +160,10 @@ export class WarehouseService {
         };
     }
 
-    async deActive(tenantId: string, id: ParamIdDto) {
+    async deActive(id: ParamIdDto) {
+        const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
-        await this.findOne(tenantId, id);
+        await this.findOne(id);
 
         await this.db.update(warehouses).set({
             isActive: false
