@@ -1,9 +1,9 @@
 import { Controller, Post, Body, Param, Get, Patch, Delete, Query } from '@nestjs/common';
-import { WarehouseService } from '../services/WarehouseService';
-import { CreateWarehouseDto } from '../dto/CreateWarehouseDto';
-import { UpdateWarehouseDto } from '../dto/UpdateWarehouseDto';
+import { WarehouseService } from './services/WarehouseService';
 import { ParamIdDto } from '../../../common/dto/ParamIdDto';
-import { FilterWarehouseDto } from '../dto/FilterWarehouseDto';
+import { UpdateWarehouseDto } from './dto/UpdateWarehouseDto';
+import { CreateWarehouseDto } from './dto/CreateWarehouseDto';
+import { FilterWarehouseDto } from './dto/FilterWarehouseDto';
 
 @Controller('warehouses') // مسیر پایه استاندارد و جمع: /warehouses
 export class WarehouseController {

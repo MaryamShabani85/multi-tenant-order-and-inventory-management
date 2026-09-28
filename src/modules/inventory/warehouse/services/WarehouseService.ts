@@ -1,14 +1,14 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { MySql2Database } from "drizzle-orm/mysql2";
-import * as schema from "../../../database/schema/ShemaRegistry";
-import { DRIZZLE_PROVIDER } from "../../../database/DrizzleProvider";
+import * as schema from "../../../../database/schema/ShemaRegistry";
+import { DRIZZLE_PROVIDER } from "../../../../database/DrizzleProvider";
 import { CreateWarehouseDto } from "../dto/CreateWarehouseDto";
 import { ulid } from "ulid";
 import { and, eq, isNull, like, ne } from "drizzle-orm";
 import { FilterWarehouseDto } from "../dto/FilterWarehouseDto";
-import { ParamIdDto } from "../../../common/dto/ParamIdDto";
+import { ParamIdDto } from "../../../../common/dto/ParamIdDto";
 import { UpdateWarehouseDto } from "../dto/UpdateWarehouseDto";
-import { TenantContextService } from "../../../core/tenant/TenantContextService";
+import { TenantContextService } from "../../../../core/tenant/TenantContextService";
 
 @Injectable()
 export class WarehouseService {

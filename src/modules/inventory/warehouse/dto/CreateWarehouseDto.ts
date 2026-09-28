@@ -1,7 +1,6 @@
 import { IsString, Matches, MaxLength } from 'class-validator';
 
-export class CreateTenantDto
-{
+export class CreateWarehouseDto {
     @IsString()
     @MaxLength(20)
     @Matches(/^[0-9-]+$/, { message: 'کد انبار فقط می‌تواند شامل اعداد و خط تیره باشد.' })
