@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { WarehouseService } from './WarehouseService';
 import { ParamIdDto } from '../../../../common/dto/ParamIdDto';
 import { DRIZZLE_PROVIDER } from '../../../../database/DrizzleProvider';
 import { TenantContextService } from '../../../../core/tenant/TenantContextService';
+import { WarehouseService } from '../../warehouse/services/WarehouseService';
 
 describe('WarehouseService', () => {
     let warehouseService: WarehouseService;
