@@ -1,17 +1,21 @@
-import { IsOptional, IsString, Length, Matches, MaxLength } from 'class-validator';
+import { IsOptional, IsString, Length, Matches, MaxLength, IsNotEmpty } from 'class-validator';
 
 export class CreateProductCategoryDto {
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'شناسه دسته والد باید از نوع متنی باشد.' })
     @Length(26, 26, { message: 'شناسه وارد شده نامعتبر است (طول شناسه باید ۲۶ کاراکتر باشد).' })
     parentCategoryId?: string;
 
-    @IsString()
-    @MaxLength(255)
+    @IsString({ message: 'نام دسته‌بندی باید از نوع متنی باشد.' })
+    @IsNotEmpty({ message: 'نام دسته‌بندی نمی‌تواند خالی باشد.' })
+    @MaxLength(255, { message: 'نام دسته‌بندی حداکثر می‌تواند ۲۵۵ کاراکتر باشد.' })
     name!: string;
 
-    @IsString()
-    @MaxLength(100)
-    @Matches(/^[a-z0-9-]+$/, { message: 'شناسه دسته بندی کالاها فقط می‌تواند شامل حروف کوچک، اعداد و خط تیره باشد.' })
+    @IsString({ message: 'اسلاگ باید از نوع متنی باشد.' })
+    @IsNotEmpty({ message: 'اسلاگ نمی‌تواند خالی باشد.' })
+    @MaxLength(100, { message: 'اسلاگ حداکثر می‌تواند ۱۰۰ کاراکتر باشد.' })
+    @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+        message: 'اسلاگ فقط می‌تواند شامل حروف کوچک انگلیسی، اعداد و خط تیره میانی باشد (مثال: mobile-phones).',
+    })
     slug!: string;
 }

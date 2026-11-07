@@ -1,13 +1,14 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { MySql2Database } from "drizzle-orm/mysql2";
 import * as schema from "../../../../database/schema/ShemaRegistry";
 import { DRIZZLE_PROVIDER } from "../../../../database/DrizzleProvider";
 import { ulid } from "ulid";
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { and, eq, isNull, like, ne, not } from "drizzle-orm";
 import { ParamIdDto } from "../../../../common/dto/ParamIdDto";
 import { TenantContextService } from "../../../../core/tenant/TenantContextService";
 import { CreateProductCategoryDto } from "../dto/CreateProductCategoryDto";
 import { UpdateProductCategoryDto } from "../dto/UpdateProductCategoryDto";
+import { FilterProductCategoryDto } from "../dto/FilterProductCategoryDto";
 
 @Injectable()
 export class ProductCategoryService {
@@ -35,6 +36,8 @@ export class ProductCategoryService {
                 where: and(
                     eq(productCategories.tenantId, tenantId),
                     eq(productCategories.id, productCategory.parentCategoryId),
+                    isNull(productCategories.deletedAt),
+
                 )
             });
             if (!existingParentCategory) {
@@ -60,6 +63,28 @@ export class ProductCategoryService {
         };
     }
 
+    async findAll(filter: FilterProductCategoryDto) {
+        const tenantId = this.tenantContext.getTenantId();
+        const productCategories = schema.ProductCategoriesSchema;
+
+        const page = filter.page && filter.page > 0 ? Number(filter.page) : 1;
+        const limit = filter.limit && filter.limit > 0 ? Math.min(Number(filter.limit), 100) : 100;
+        const offset = (page - 1) * limit;
+
+        return await this.db.query.ProductCategoriesSchema.findMany({
+            where: and(
+                eq(productCategories.tenantId, tenantId),
+                isNull(productCategories.deletedAt),
+                filter.parentCategoryId ? eq(productCategories.parentCategoryId, filter.parentCategoryId) : undefined,
+                filter.name ? like(productCategories.name, `%${filter.name}%`) : undefined,
+                filter.slug ? like(productCategories.slug, `%${filter.slug}%`) : undefined,
+                filter.isActive !== undefined ? eq(productCategories.isActive, filter.isActive) : undefined,
+            ),
+            limit,
+            offset,
+        });
+    }
+
     async findOne(id: ParamIdDto) {
         const tenantId = this.tenantContext.getTenantId();
         const productCategories = schema.ProductCategoriesSchema;
@@ -81,6 +106,11 @@ export class ProductCategoryService {
     async update(id: ParamIdDto, productCategory: UpdateProductCategoryDto) {
         const tenantId = this.tenantContext.getTenantId();
         const productCategories = schema.ProductCategoriesSchema;
+
+        // ۱. بررسی ارجاع به خود (Self-reference check)
+        if (productCategory.parentCategoryId && productCategory.parentCategoryId === id.id) {
+            throw new BadRequestException('یک دسته‌بندی نمی‌تواند والد خودش باشد.');
+        }
 
         // بررسی وجود دسته بندی زنده
         await this.findOne(id);
@@ -104,6 +134,7 @@ export class ProductCategoryService {
                 where: and(
                     eq(productCategories.tenantId, tenantId),
                     eq(productCategories.id, productCategory.parentCategoryId),
+                    isNull(productCategories.deletedAt),
                 )
             });
             if (!existingParentCategory) {

@@ -52,6 +52,11 @@ export class WarehouseService {
     async findAll(filter: FilterWarehouseDto) {
         const tenantId = this.tenantContext.getTenantId();
         const warehouses = schema.WarehousesSchema;
+
+        const page = filter.page && filter.page > 0 ? Number(filter.page) : 1;
+        const limit = filter.limit && filter.limit > 0 ? Math.min(Number(filter.limit), 100) : 100;
+        const offset = (page - 1) * limit;
+
         return await this.db.query.WarehousesSchema.findMany({
             where: and(
                 eq(warehouses.tenantId, tenantId),
@@ -60,7 +65,9 @@ export class WarehouseService {
                 filter.name ? like(warehouses.name, `%${filter.name}%`) : undefined,
                 filter.address ? like(warehouses.address, `%${filter.address}%`) : undefined,
                 filter.isActive !== undefined ? eq(warehouses.isActive, filter.isActive) : undefined,
-            )
+            ),
+            limit,
+            offset,
         });
     }
 

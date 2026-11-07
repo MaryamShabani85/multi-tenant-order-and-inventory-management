@@ -1,4 +1,4 @@
-import { IsEnum, IsString, Matches, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Matches, MaxLength } from 'class-validator';
 import { TenantStatusEnum } from '../../../enum/TenantStatusEnum';
 
 export class CreateTenantDto {
